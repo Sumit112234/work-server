@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Filter</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg h-full overflow-scroll">
+        <h1 class="text-2xl font-bold mb-6 text-center">Server</h1>
+        
+        <!-- Category Selector -->
+        <label class="block mb-2 text-gray-700">Select Category</label>
+        <select id="category" class="mb-4 w-full p-2 border border-gray-300 rounded">
+            <option value="">Select a category</option>
+            <option value="JEE">JEE</option>
+            <option value="NEET">NEET</option>
+            <option value="CET">CET</option>
+            <option value="GATE">GATE</option>
+        </select>
+ 
+        <label class="block mb-2 text-gray-700">Select Subject</label>
+        <select id="subject" class="mb-4 w-full p-2 border border-gray-300 rounded">
+            <option value="">Select a subject</option>
+            <option value="Physics">Physics</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Math">Math</option>
+            <option value="Biology">Biology</option>
+        </select>
+
+    
+        <label class="block mb-2 text-gray-700">Select Chapter</label>
+        <input id="chapter" type="number" min="1" max="20" placeholder="Enter chapter number" class="mb-4 w-full p-2 border border-gray-300 rounded">
+
+
+        <button onclick="fetchQuestions()" class="w-full bg-blue-500 text-white py-2 rounded mt-4">Get Questions</button>
+
+
+        <div id="results" class="mt-6"></div>
+    </div>
+
+    <script>
+        async function fetchQuestions() {
+
+            const category = document.getElementById("category").value;
+            const subject = document.getElementById("subject").value;
+            const chapter = document.getElementById("chapter").value;
+            console.log('hello ji', category, subject, chapter)
+            
+            const response = await fetch(`http://localhost:3000/api/questions?category=${category}&subject=${subject}&chapter=${chapter}`);
+            const questions = await response.json();
+
+
+            console.log(questions);
+
+            const results = document.getElementById("results");
+            results.innerHTML = "";
+
+            if (questions.length > 0) {
+                questions.forEach(question => {
+                    const questionElement = document.createElement("div");
+                    questionElement.className = "p-4 mb-4 bg-gray-200 rounded-lg";
+                    questionElement.innerHTML = `
+                        <h3 class="font-bold">${question.question}</h3>
+                        <div class="w-fit m-3 rounded-md text-sm font-semibold text-red-500">1 : ${question.options[0]}</div>
+                        <div class="w-fit m-3 rounded-md text-sm font-semibold text-red-500">2 : ${question.options[1]}</div>
+                        <div class="w-fit m-3 rounded-md text-sm font-semibold text-red-500">3 : ${question.options[2]}</div>
+                        <div class="w-fit m-3 rounded-md text-sm font-semibold text-red-500">4 : ${question.options[3]}</div>
+                        <p><strong class="text-green-500">Answer:</strong> ${question.answer}</p>
+                    `;
+                    results.appendChild(questionElement);
+                });
+            } else {
+                results.innerHTML = "<p class='text-red-500'>No questions found</p>";
+            }
+        }
+    </script>
+</body>
+</html>
